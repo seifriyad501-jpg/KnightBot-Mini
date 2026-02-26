@@ -1,5 +1,5 @@
 /**
- * قائمة الأوامر الرئيسية - عرض جميع الأوامر المتاحة (نسخة عربية)
+ * قائمة الأوامر الرئيسية - عرض جميع الأوامر المتاحة (نسخة عربية - أسماء فقط)
  */
 
 const config = require('../../config');
@@ -45,8 +45,8 @@ module.exports = {
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.general.forEach(cmd => {
           const cmdName = cmd.name || 'غير معروف';
-          const desc = cmd.description || 'لا يوجد وصف';
-          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
+          // عرض اسم الأمر فقط من دون وصف
+          menuText += `│ ➜ ${config.prefix}${cmdName}\n`;
         });
         menuText += `\n`;
       }
@@ -58,8 +58,7 @@ module.exports = {
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.ai.forEach(cmd => {
           const cmdName = cmd.name || 'غير معروف';
-          const desc = cmd.description || 'لا يوجد وصف';
-          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
+          menuText += `│ ➜ ${config.prefix}${cmdName}\n`;
         });
         menuText += `\n`;
       }
@@ -71,8 +70,7 @@ module.exports = {
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.group.forEach(cmd => {
           const cmdName = cmd.name || 'غير معروف';
-          const desc = cmd.description || 'لا يوجد وصف';
-          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
+          menuText += `│ ➜ ${config.prefix}${cmdName}\n`;
         });
         menuText += `\n`;
       }
@@ -84,8 +82,7 @@ module.exports = {
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.admin.forEach(cmd => {
           const cmdName = cmd.name || 'غير معروف';
-          const desc = cmd.description || 'لا يوجد وصف';
-          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
+          menuText += `│ ➜ ${config.prefix}${cmdName}\n`;
         });
         menuText += `\n`;
       }
@@ -97,8 +94,7 @@ module.exports = {
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.owner.forEach(cmd => {
           const cmdName = cmd.name || 'غير معروف';
-          const desc = cmd.description || 'لا يوجد وصف';
-          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
+          menuText += `│ ➜ ${config.prefix}${cmdName}\n`;
         });
         menuText += `\n`;
       }
@@ -110,8 +106,7 @@ module.exports = {
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.media.forEach(cmd => {
           const cmdName = cmd.name || 'غير معروف';
-          const desc = cmd.description || 'لا يوجد وصف';
-          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
+          menuText += `│ ➜ ${config.prefix}${cmdName}\n`;
         });
         menuText += `\n`;
       }
@@ -123,8 +118,7 @@ module.exports = {
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.fun.forEach(cmd => {
           const cmdName = cmd.name || 'غير معروف';
-          const desc = cmd.description || 'لا يوجد وصف';
-          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
+          menuText += `│ ➜ ${config.prefix}${cmdName}\n`;
         });
         menuText += `\n`;
       }
@@ -136,8 +130,7 @@ module.exports = {
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.utility.forEach(cmd => {
           const cmdName = cmd.name || 'غير معروف';
-          const desc = cmd.description || 'لا يوجد وصف';
-          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
+          menuText += `│ ➜ ${config.prefix}${cmdName}\n`;
         });
         menuText += `\n`;
       }
@@ -149,8 +142,7 @@ module.exports = {
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.anime.forEach(cmd => {
           const cmdName = cmd.name || 'غير معروف';
-          const desc = cmd.description || 'لا يوجد وصف';
-          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
+          menuText += `│ ➜ ${config.prefix}${cmdName}\n`;
         });
         menuText += `\n`;
       }
@@ -162,8 +154,7 @@ module.exports = {
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.textmaker.forEach(cmd => {
           const cmdName = cmd.name || 'غير معروف';
-          const desc = cmd.description || 'لا يوجد وصف';
-          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
+          menuText += `│ ➜ ${config.prefix}${cmdName}\n`;
         });
         menuText += `\n`;
       }
@@ -175,8 +166,7 @@ module.exports = {
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories['غير مصنف'].forEach(cmd => {
           const cmdName = cmd.name || 'غير معروف';
-          const desc = cmd.description || 'لا يوجد وصف';
-          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
+          menuText += `│ ➜ ${config.prefix}${cmdName}\n`;
         });
         menuText += `\n`;
       }
