@@ -54,7 +54,7 @@ module.exports = {
     
     // مفاتيح API (حط مفاتيحك هنا لو عندك)
     apiKeys: {
-      openai: '',
+      openai: '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',
       deepai: '',
       remove_bg: ''
     },
