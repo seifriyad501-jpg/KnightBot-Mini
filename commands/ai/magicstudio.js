@@ -1,11 +1,11 @@
 /**
- * Generate AI Image Command - Multiple API Support
- * Generate AI-powered images from text prompts using various APIs
+ * أمر توليد الصور بالذكاء الاصطناعي
+ * توليد صور من النص باستخدام عدة مصادر
  */
 
 const axios = require('axios');
 
-// Multiple API endpoints for fallback
+// عدة مصادر للصور (لو مصدر وقع، يجرب اللي بعده)
 const APIS = [
   {
     name: 'Prodia',
@@ -30,58 +30,61 @@ const APIS = [
 ];
 
 module.exports = {
-  name: 'imagine',
-  aliases: ['aiimage', 'generate', 'draw', 'تخيل'],
-  category: 'ai',
-  description: 'Generate AI image from text prompt',
-  usage: '.imagine <your prompt>',
+  name: 'تخيل',
+  aliases: ['imagine', 'aiimage', 'generate', 'draw', 'صور'],
+  category: 'ذكاء',
+  description: 'توليد صورة بالذكاء الاصطناعي من النص',
+  usage: '.تخيل <النص المطلوب>',
   
   async execute(sock, msg, args, extra) {
     try {
+      // جمع النص اللي المستخدم كتبه
       const prompt = args.join(' ').trim();
       
+      // لو مفيش نص، يطلب من المستخدم يكتب حاجة
       if (!prompt) {
         return extra.reply(
-          '🎨 *Generate AI Images*\n\n' +
-          'Please provide a prompt.\n\n' +
-          'Example:\n' +
-          '.imagine a beautiful sunset over mountains\n' +
-          '.imagine cyberpunk cat with neon lights'
+          '🎨 *توليد الصور بالذكاء الاصطناعي*\n\n' +
+          '❌ لازم تكتب وصف للصورة.\n\n' +
+          '📝 *أمثلة:*\n' +
+          '.تخيل غروب الشمس فوق الجبال\n' +
+          '.تخيل قطة سايبربانك بأضواء نيون'
         );
       }
 
-      // Send initial waiting message
-      await extra.reply('⏳ *Generating your image...*\nPlease wait 30-60 seconds.');
+      // رسالة انتظار
+      await extra.reply('⏳ *جاري توليد الصورة...*\nمن فضلك انتظر 30-60 ثانية.');
       
       let imageBuffer = null;
       let lastError = null;
 
-      // Try each API until one works
+      // نجرب كل المصادر بالترتيب
       for (const api of APIS) {
         try {
-          console.log(`Trying ${api.name} API...`);
+          console.log(`جاري تجربة ${api.name}...`);
           
           const response = await axios.get(api.url(prompt), {
             responseType: 'arraybuffer',
-            timeout: 60000, // 60 seconds timeout
+            timeout: 60000, // 60 ثانية كحد أقصى
             headers: {
               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
           });
 
+          // لو جابت نتيجة
           if (response.data && response.data.length > 0) {
-            // Check if response is JSON (contains error)
+            // لو النتيجة JSON (بعض المواقع بترجع رابط صورة)
             if (response.headers['content-type']?.includes('application/json')) {
               const textData = Buffer.from(response.data).toString();
               try {
                 const json = JSON.parse(textData);
                 if (json.error || json.status === false) {
-                  console.log(`${api.name} returned error:`, json);
+                  console.log(`${api.name} رجع خطأ:`, json);
                   continue;
                 }
-                // Some APIs return image URL in JSON
-                if (json.result?.url || json.url || json.image || json.data?.url) {
-                  const imageUrl = json.result?.url || json.url || json.image || json.data?.url;
+                // استخراج رابط الصورة من JSON
+                const imageUrl = json.result?.url || json.url || json.image || json.data?.url;
+                if (imageUrl) {
                   const imgResponse = await axios.get(imageUrl, {
                     responseType: 'arraybuffer',
                     timeout: 30000
@@ -90,51 +93,51 @@ module.exports = {
                   break;
                 }
               } catch (e) {
-                console.log(`${api.name} JSON parse failed`);
+                console.log(`${api.name} فشل في قراءة JSON`);
               }
             } else {
-              // Direct image response
+              // لو الصورة مباشرة
               imageBuffer = Buffer.from(response.data);
               
-              // Check if buffer is valid image (simple check)
+              // نتأكد إن الصورة مش فارغة
               if (imageBuffer.length > 1000) {
                 break;
               }
             }
           }
         } catch (err) {
-          console.log(`${api.name} failed:`, err.message);
+          console.log(`${api.name} فشل:`, err.message);
           lastError = err;
-          continue; // Try next API
+          continue; // نجرب المصدر اللي بعده
         }
       }
 
-      // If no API worked
+      // لو كل المصادر فشلت
       if (!imageBuffer || imageBuffer.length < 1000) {
-        throw new Error(lastError?.message || 'All APIs failed to generate image');
+        throw new Error(lastError?.message || 'كل المصادر فشلت في توليد الصورة');
       }
 
-      // Check file size (WhatsApp limit ~5MB)
+      // نتأكد إن حجم الصورة مناسب (واتساب بيقبل حتى 5 ميجا)
       if (imageBuffer.length > 5 * 1024 * 1024) {
-        return extra.reply('❌ Generated image is too large for WhatsApp. Try a simpler prompt.');
+        return extra.reply('❌ حجم الصورة كبير جداً. جرب وصف أبسط.');
       }
 
-      // Send the image
+      // نرسل الصورة للمستخدم
       await sock.sendMessage(extra.from, {
         image: imageBuffer,
-        caption: `🎨 *Prompt:* ${prompt}\n✨ Generated using AI`
+        caption: `🎨 *الوصف:* ${prompt}\n✨ تم التوليد باستخدام ${APIS.find(api => api.name)?.name || 'الذكاء الاصطناعي'}`
       }, { quoted: msg });
 
     } catch (error) {
-      console.error('Error in imagine command:', error);
+      console.error('خطأ في أمر التخيل:', error);
       
-      // Handle specific errors
+      // رسائل خطأ حسب نوع المشكلة
       if (error.message.includes('timed out') || error.code === 'ECONNABORTED') {
-        await extra.reply('❌ Request timed out. The servers are busy. Please try again later.');
+        await extra.reply('❌ الوقت انتهى. الخوادم مشغولة حالياً. حاول مرة تانية.');
       } else if (error.message.includes('socket')) {
-        await extra.reply('❌ Network error. Please check your connection and try again.');
+        await extra.reply('❌ مشكلة في الاتصال. تأكد من اتصالك بالنت.');
       } else {
-        await extra.reply(`❌ Failed to generate image: ${error.message}\n\nTry again with a different prompt.`);
+        await extra.reply(`❌ فشل توليد الصورة: ${error.message}\n\nحاول بوصف مختلف.`);
       }
     }
   }
