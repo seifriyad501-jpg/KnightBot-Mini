@@ -1,80 +1,89 @@
 /**
- * Antilink Command - Toggle antilink protection with delete/kick options
+ * أمر منع الروابط - تشغيل/إيقاف حماية الروابط مع خيارات الحذف أو الطرد
  */
 
 const database = require('../../database');
 
 module.exports = {
-  name: 'antilink',
-  aliases: [],
-  category: 'admin',
-  description: 'Configure antilink protection (delete/kick)',
-  usage: '.antilink <on/off/set/get>',
+  name: 'منع_الروابط', // الاسم الأساسي للأمر (عربي)
+  aliases: ['منع_الرابط', 'antilink'], // أسماء بديلة
+  category: 'ادمن', // الفئة
+  description: 'تفعيل/إلغاء حماية الروابط (حذف/طرد)',
+  usage: '.منع_الروابط <تشغيل/ايقاف/ضبط/عرض>',
   groupOnly: true,
   adminOnly: true,
   botAdminNeeded: true,
   
   async execute(sock, msg, args, extra) {
     try {
+      // عرض المساعدة والإعدادات الحالية إذا لم يكتب المستخدم أي خيارات
       if (!args[0]) {
         const settings = database.getGroupSettings(extra.from);
-        const status = settings.antilink ? 'ON' : 'OFF';
-        const action = settings.antilinkAction || 'delete';
+        const status = settings.antilink ? '🟢 مفعل' : '🔴 غير مفعل';
+        const action = settings.antilinkAction === 'delete' ? '🗑️ حذف' : '👢 طرد';
         return extra.reply(
-          `🔗 *Antilink Status*\n\n` +
-          `Status: *${status}*\n` +
-          `Action: *${action}*\n\n` +
-          `Usage:\n` +
-          `  .antilink on\n` +
-          `  .antilink off\n` +
-          `  .antilink set delete | kick\n` +
-          `  .antilink get`
+          `🔗 *إعدادات منع الروابط*\n\n` +
+          `الحالة: *${status}*\n` +
+          `الإجراء: *${action}*\n\n` +
+          `*طريقة الاستخدام:*\n` +
+          `  .منع_الروابط تشغيل\n` +
+          `  .منع_الروابط ايقاف\n` +
+          `  .منع_الروابط ضبط حذف | طرد\n` +
+          `  .منع_الروابط عرض`
         );
       }
       
       const opt = args[0].toLowerCase();
       
-      if (opt === 'on') {
+      // تشغيل الميزة
+      if (opt === 'تشغيل' || opt === 'on') {
         if (database.getGroupSettings(extra.from).antilink) {
-          return extra.reply('*Antilink is already on*');
+          return extra.reply('*✅ منع الروابط مفعل بالفعل*');
         }
         database.updateGroupSettings(extra.from, { antilink: true });
-        return extra.reply('*Antilink has been turned ON*');
+        return extra.reply('*✅ تم تفعيل منع الروابط*');
       }
       
-      if (opt === 'off') {
+      // إيقاف الميزة
+      if (opt === 'ايقاف' || opt === 'off') {
         database.updateGroupSettings(extra.from, { antilink: false });
-        return extra.reply('*Antilink has been turned OFF*');
+        return extra.reply('*✅ تم إيقاف منع الروابط*');
       }
       
-      if (opt === 'set') {
+      // ضبط الإجراء (حذف أو طرد)
+      if (opt === 'ضبط' || opt === 'set') {
         if (args.length < 2) {
-          return extra.reply('*Please specify an action: .antilink set delete | kick*');
+          return extra.reply('*❌ حدد الإجراء: .منع_الروابط ضبط حذف | طرد*');
         }
         
         const setAction = args[1].toLowerCase();
-        if (!['delete', 'kick'].includes(setAction)) {
-          return extra.reply('*Invalid action. Choose delete or kick.*');
+        if (setAction !== 'حذف' && setAction !== 'طرد') {
+          return extra.reply('*❌ إجراء غير صالح. اختر "حذف" أو "طرد".*');
         }
         
+        // تحويل الكلمة العربية للقيمة المخزنة في قاعدة البيانات
+        const dbAction = setAction === 'حذف' ? 'delete' : 'kick';
+        
         database.updateGroupSettings(extra.from, { 
-          antilinkAction: setAction,
-          antilink: true // Auto-enable when setting action
+          antilinkAction: dbAction,
+          antilink: true // يتم التفعيل تلقائياً عند ضبط الإجراء
         });
-        return extra.reply(`*Antilink action set to ${setAction}*`);
+        return extra.reply(`*✅ تم ضبط إجراء منع الروابط على: ${setAction}*`);
       }
       
-      if (opt === 'get') {
+      // عرض الإعدادات الحالية
+      if (opt === 'عرض' || opt === 'get') {
         const settings = database.getGroupSettings(extra.from);
-        const status = settings.antilink ? 'ON' : 'OFF';
-        const action = settings.antilinkAction || 'delete';
-        return extra.reply(`*Antilink Configuration:*\nStatus: ${status}\nAction: ${action}`);
+        const status = settings.antilink ? '🟢 مفعل' : '🔴 غير مفعل';
+        const action = settings.antilinkAction === 'delete' ? '🗑️ حذف' : '👢 طرد';
+        return extra.reply(`*⚙️ إعدادات منع الروابط:*\nالحالة: ${status}\nالإجراء: ${action}`);
       }
       
-      return extra.reply('*Use .antilink for usage.*');
+      // إذا كتب المستخدم خيار غير معروف
+      return extra.reply('*❓ استخدم .منع_الروابط لعرض التعليمات.*');
       
     } catch (error) {
-      await extra.reply(`❌ Error: ${error.message}`);
+      await extra.reply(`❌ خطأ: ${error.message}`);
     }
   }
 };
