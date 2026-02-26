@@ -44,8 +44,8 @@ module.exports = {
         menuText += `┃ 🧭 أوامر عامة\n`;
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.general.forEach(cmd => {
-// من غير وصف مؤقتاً
-menuText += `│ ➜ ${config.prefix}${cmdName}\n`;
+          const cmdName = cmd.name || 'غير معروف';
+          const desc = cmd.description || 'لا يوجد وصف';
           menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
         });
         menuText += `\n`;
