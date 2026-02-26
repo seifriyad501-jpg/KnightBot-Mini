@@ -1,5 +1,5 @@
 /**
- * Menu Command - Display all available commands
+ * قائمة الأوامر الرئيسية - عرض جميع الأوامر المتاحة (نسخة عربية)
  */
 
 const config = require('../../config');
@@ -7,156 +7,191 @@ const { loadCommands } = require('../../utils/commandLoader');
 
 module.exports = {
   name: 'menu',
-  aliases: ['help', 'commands'],
-  category: 'general',
-  description: 'Show all available commands',
-  usage: '.menu',
+  aliases: ['help', 'اوامر', 'مساعدة', 'القائمة'],
+  category: 'عام',
+  description: 'عرض جميع الأوامر المتاحة',
+  usage: 'menu',
   
   async execute(sock, msg, args, extra) {
     try {
       const commands = loadCommands();
       const categories = {};
       
-      // Group commands by category
+      // تجميع الأوامر حسب الفئة
       commands.forEach((cmd, name) => {
-        if (cmd.name === name) { // Only count main command names, not aliases
-          if (!categories[cmd.category]) {
-            categories[cmd.category] = [];
+        if (cmd.name === name) { // نحسب الأوامر الأساسية فقط (مش الأسماء البديلة)
+          const category = cmd.category || 'غير مصنف';
+          if (!categories[category]) {
+            categories[category] = [];
           }
-          categories[cmd.category].push(cmd);
+          categories[category].push(cmd);
         }
       });
       
       const ownerNames = Array.isArray(config.ownerName) ? config.ownerName : [config.ownerName];
-      const displayOwner = ownerNames[0] || config.ownerName || 'Bot Owner';
+      const displayOwner = ownerNames[0] || config.ownerName || 'مالك البوت';
       
-      let menuText = `╭━━『 *${config.botName}* 』━━╮\n\n`;
-      menuText += `👋 Hello @${extra.sender.split('@')[0]}!\n\n`;
-      menuText += `⚡ Prefix: ${config.prefix}\n`;
-      menuText += `📦 Total Commands: ${commands.size}\n`;
-      menuText += `👑 Owner: ${displayOwner}\n\n`;
+      // بداية القائمة
+      let menuText = `╭━━『 *${config.botName || 'البوت العربي'}* 』━━╮\n\n`;
+      menuText += `👋 مرحباً @${extra.sender.split('@')[0]}!\n\n`;
+      menuText += `⚡ البادئة: ${config.prefix || '(بدون بادئة)'}\n`;
+      menuText += `📦 إجمالي الأوامر: ${commands.size}\n`;
+      menuText += `👑 المالك: ${displayOwner}\n\n`;
       
-      // General Commands
+      // أوامر عامة
       if (categories.general) {
         menuText += `┏━━━━━━━━━━━━━━━━━\n`;
-        menuText += `┃ 🧭 GENERAL COMMAND\n`;
+        menuText += `┃ 🧭 أوامر عامة\n`;
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.general.forEach(cmd => {
-          menuText += `│ ➜ ${config.prefix}${cmd.name}\n`;
+          const cmdName = cmd.name || 'غير معروف';
+          const desc = cmd.description || 'لا يوجد وصف';
+          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
         });
         menuText += `\n`;
       }
       
-      // AI Commands
+      // أوامر الذكاء الاصطناعي
       if (categories.ai) {
         menuText += `┏━━━━━━━━━━━━━━━━━\n`;
-        menuText += `┃ 🤖 AI COMMAND\n`;
+        menuText += `┃ 🤖 أوامر الذكاء الاصطناعي\n`;
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.ai.forEach(cmd => {
-          menuText += `│ ➜ ${config.prefix}${cmd.name}\n`;
+          const cmdName = cmd.name || 'غير معروف';
+          const desc = cmd.description || 'لا يوجد وصف';
+          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
         });
         menuText += `\n`;
       }
       
-      // Group Commands
+      // أوامر المجموعات
       if (categories.group) {
         menuText += `┏━━━━━━━━━━━━━━━━━\n`;
-        menuText += `┃ 🔵 GROUP COMMAND\n`;
+        menuText += `┃ 🔵 أوامر المجموعات\n`;
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.group.forEach(cmd => {
-          menuText += `│ ➜ ${config.prefix}${cmd.name}\n`;
+          const cmdName = cmd.name || 'غير معروف';
+          const desc = cmd.description || 'لا يوجد وصف';
+          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
         });
         menuText += `\n`;
       }
       
-      // Admin Commands
+      // أوامر المشرفين
       if (categories.admin) {
         menuText += `┏━━━━━━━━━━━━━━━━━\n`;
-        menuText += `┃ 🛡️ ADMIN COMMAND\n`;
+        menuText += `┃ 🛡️ أوامر المشرفين\n`;
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.admin.forEach(cmd => {
-          menuText += `│ ➜ ${config.prefix}${cmd.name}\n`;
+          const cmdName = cmd.name || 'غير معروف';
+          const desc = cmd.description || 'لا يوجد وصف';
+          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
         });
         menuText += `\n`;
       }
       
-      // Owner Commands
+      // أوامر المالك
       if (categories.owner) {
         menuText += `┏━━━━━━━━━━━━━━━━━\n`;
-        menuText += `┃ 👑 OWNER COMMAND\n`;
+        menuText += `┃ 👑 أوامر المالك\n`;
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.owner.forEach(cmd => {
-          menuText += `│ ➜ ${config.prefix}${cmd.name}\n`;
+          const cmdName = cmd.name || 'غير معروف';
+          const desc = cmd.description || 'لا يوجد وصف';
+          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
         });
         menuText += `\n`;
       }
       
-      // Media Commands
+      // أوامر الوسائط
       if (categories.media) {
         menuText += `┏━━━━━━━━━━━━━━━━━\n`;
-        menuText += `┃ 🎞️ MEDIA COMMAND\n`;
+        menuText += `┃ 🎞️ أوامر الوسائط\n`;
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.media.forEach(cmd => {
-          menuText += `│ ➜ ${config.prefix}${cmd.name}\n`;
+          const cmdName = cmd.name || 'غير معروف';
+          const desc = cmd.description || 'لا يوجد وصف';
+          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
         });
         menuText += `\n`;
       }
       
-      // Fun Commands
+      // أوامر ترفيهية
       if (categories.fun) {
         menuText += `┏━━━━━━━━━━━━━━━━━\n`;
-        menuText += `┃ 🎭 FUN COMMAND\n`;
+        menuText += `┃ 🎭 أوامر ترفيهية\n`;
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.fun.forEach(cmd => {
-          menuText += `│ ➜ ${config.prefix}${cmd.name}\n`;
+          const cmdName = cmd.name || 'غير معروف';
+          const desc = cmd.description || 'لا يوجد وصف';
+          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
         });
         menuText += `\n`;
       }
       
-      // Utility Commands
+      // أوامر الأدوات
       if (categories.utility) {
         menuText += `┏━━━━━━━━━━━━━━━━━\n`;
-        menuText += `┃ 🔧 UTILITY COMMAND\n`;
+        menuText += `┃ 🔧 أوامر الأدوات\n`;
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.utility.forEach(cmd => {
-          menuText += `│ ➜ ${config.prefix}${cmd.name}\n`;
+          const cmdName = cmd.name || 'غير معروف';
+          const desc = cmd.description || 'لا يوجد وصف';
+          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
         });
         menuText += `\n`;
       }
 
-       // Anime Commands
-       if (categories.anime) {
+      // أوامر الأنمي
+      if (categories.anime) {
         menuText += `┏━━━━━━━━━━━━━━━━━\n`;
-        menuText += `┃ 👾 ANIME COMMAND\n`;
+        menuText += `┃ 👾 أوامر الأنمي\n`;
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.anime.forEach(cmd => {
-          menuText += `│ ➜ ${config.prefix}${cmd.name}\n`;
+          const cmdName = cmd.name || 'غير معروف';
+          const desc = cmd.description || 'لا يوجد وصف';
+          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
         });
         menuText += `\n`;
       }
 
-       // Textmaker Commands
-       if (categories.utility) {
+      // أوامر صناعة النصوص (Textmaker)
+      if (categories.textmaker) {
         menuText += `┏━━━━━━━━━━━━━━━━━\n`;
-        menuText += `┃ 🖋️ TEXTMAKER COMMAND\n`;
+        menuText += `┃ 🖋️ أوامر صناعة النصوص\n`;
         menuText += `┗━━━━━━━━━━━━━━━━━\n`;
         categories.textmaker.forEach(cmd => {
-          menuText += `│ ➜ ${config.prefix}${cmd.name}\n`;
+          const cmdName = cmd.name || 'غير معروف';
+          const desc = cmd.description || 'لا يوجد وصف';
+          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
+        });
+        menuText += `\n`;
+      }
+      
+      // الفئات غير المصنفة
+      if (categories['غير مصنف']) {
+        menuText += `┏━━━━━━━━━━━━━━━━━\n`;
+        menuText += `┃ 📁 أوامر أخرى\n`;
+        menuText += `┗━━━━━━━━━━━━━━━━━\n`;
+        categories['غير مصنف'].forEach(cmd => {
+          const cmdName = cmd.name || 'غير معروف';
+          const desc = cmd.description || 'لا يوجد وصف';
+          menuText += `│ ➜ ${config.prefix}${cmdName} - ${desc}\n`;
         });
         menuText += `\n`;
       }
       
       menuText += `╰━━━━━━━━━━━━━━━━━\n\n`;
-      menuText += `💡 Type ${config.prefix}help <command> for more info\n`;
-      menuText += `🌟 Bot Version: 1.0.0\n`;
+      menuText += `💡 اكتب ${config.prefix}help <اسم_الأمر> لمزيد من المعلومات\n`;
+      menuText += `🌟 إصدار البوت: 1.0.0\n`;
       
-      // Send menu with image
+      // إرسال القائمة مع الصورة
       const fs = require('fs');
       const path = require('path');
       const imagePath = path.join(__dirname, '../../utils/bot_image.jpg');
       
       if (fs.existsSync(imagePath)) {
-        // Send image with newsletter forwarding context
+        // إرسال الصورة مع النص
         const imageBuffer = fs.readFileSync(imagePath);
         await sock.sendMessage(extra.from, {
           image: imageBuffer,
@@ -167,12 +202,13 @@ module.exports = {
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
               newsletterJid: config.newsletterJid || '120363161513685998@newsletter',
-              newsletterName: config.botName,
+              newsletterName: config.botName || 'البوت العربي',
               serverMessageId: -1
             }
           }
         }, { quoted: msg });
       } else {
+        // لو الصورة مش موجودة، ابعت نص بس
         await sock.sendMessage(extra.from, {
           text: menuText,
           mentions: [extra.sender]
@@ -180,7 +216,7 @@ module.exports = {
       }
       
     } catch (error) {
-      await extra.reply(`❌ Error: ${error.message}`);
+      await extra.reply(`❌ خطأ: ${error.message}`);
     }
   }
 };
